@@ -1,5 +1,6 @@
 import app from 'firebase/app';
-import auth from 'firebase/auth';
+import 'firebase/auth';
+import 'firebase/database';
 
 var config = {
   apiKey: "AIzaSyDqlwIWdPCryDxlqu-s6i-cxSD03n3mv6s",
@@ -15,7 +16,10 @@ class Firebase {
     app.initializeApp(config);
 
     this.auth = app.auth();
+    this.db = app.database();
   }
+
+  /* Auth API */
 
   doCreateUserWithEmailAndPassword = (email, password) => (
     this.auth.createUserWithEmailAndPassword(email, password)
@@ -36,6 +40,45 @@ class Firebase {
   doPasswordUpdate = password => (
     this.auth.currentUser.updatePassword(password)
   );
+
+
+  /* User API */
+
+  user = uid => (
+    this.db.ref(`users/${uid}`)
+  );
+
+  users = () => (
+    this.db.ref('users')
+  );
+
+  /* Merge Auth & DB User API */
+
+  onAuthUserListener = (next, fallback) => {
+    return this.auth.onAuthStateChanged(authUser => {
+      if (authUser) {
+        this.user(authUser.uid)
+        .once('value')
+        .then(snapshot => {
+          const dbUser = snapshot.val();
+
+          if (!dbUser.roles) {
+            dbUser.roles = [];
+          }
+
+          authUser = {
+            uid: authUser.uid,
+            email: authUser.email,
+            ...dbUser
+          };
+
+          next(authUser);
+        })
+      } else {
+        fallback();
+      }
+    })
+  }
 }
 
 export default Firebase;

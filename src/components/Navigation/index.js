@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import SignOutButton from '../SignOut';
 import {AuthUserContext} from '../Session';
 import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
+import { auth } from 'firebase';
 
 
 const Navigation = () => (
@@ -17,7 +19,9 @@ const Navigation = () => (
               <>
                 <Link to={ROUTES.HOME}>Home</Link>
                 <Link to={ROUTES.ACCOUNT}>Account</Link>
-                <Link to={ROUTES.ADMIN}>Admin</Link>
+                {authUser.roles.includes(ROLES.ADMIN) &&
+                  <Link to={ROUTES.ADMIN}>Admin</Link>
+                }
                 <SignOutButton/>
               </>
             ) : (

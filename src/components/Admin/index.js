@@ -62,7 +62,6 @@ const UserList = ({users}) => (
   <>
     {users.map(user => (
       <div key={user.uid}>
-        {console.log(user)}
         <div>
           <strong>ID:</strong> {user.uid}
         </div>

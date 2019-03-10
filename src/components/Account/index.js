@@ -1,6 +1,11 @@
 import React, {Component} from 'react';
+import {compose} from 'recompose';
 
-import { AuthUserContext, withAuthorization } from '../Session';
+import {
+  AuthUserContext,
+  withAuthorization,
+  withEmailVerification
+} from '../Session';
 import { PasswordForgetForm } from '../PasswordForget';
 import { PasswordChangeForm } from '../PasswordChange';
 import { withFirebase } from '../Firebase';
@@ -77,7 +82,7 @@ class DefaultLoginToggle extends Component {
       passwordTwo
     } = this.state;
 
-    const isInvalid = passwordOne === passwordTwo || passwordOne === '';
+    const isInvalid = passwordOne != passwordTwo || passwordOne === '';
 
     return isEnabled ? (
       <button
@@ -179,7 +184,7 @@ class LoginManagementBase extends Component {
   }
 
   onDefaultLoginLink = password => {
-    const credential = this.props.firebase.emailAuthProvider(
+    const credential = this.props.firebase.emailAuthProvider.credential(
       this.props.authUser.email,
       password
     );
@@ -250,4 +255,7 @@ const condition = authUser => !!authUser;
 
 const LoginManagement = withFirebase(LoginManagementBase);
 
-export default withAuthorization(condition)(AccountPage);
+export default compose(
+  withEmailVerification,
+  withAuthorization(condition)
+)(AccountPage);

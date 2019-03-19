@@ -18,6 +18,8 @@ class Firebase {
     this.auth = app.auth();
     this.db = app.database();
 
+    this.serverValue = app.database.ServerValue;
+    
     this.emailAuthProvider = app.auth.EmailAuthProvider;
     this.googleProvider = new app.auth.GoogleAuthProvider();
     this.facebookProvider = new app.auth.FacebookAuthProvider();
@@ -74,6 +76,14 @@ class Firebase {
   users = () => (
     this.db.ref('users')
   );
+
+  /* Message API */
+
+  message = uid => 
+    this.db.ref(`messages/${uid}`)
+
+  messages = () => 
+    this.db.ref('messages')
 
   /* Merge Auth & DB User API */
 
